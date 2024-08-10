@@ -47,5 +47,26 @@ select * from cte4 natural join cte5 order by cte4.year,cte4.month;<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/18506343-4927-40cc-bdd6-96f205bde907)
 
+#### 3. For each customer, find the “most favorite” product (the product that the customer purchased the most) and the “least favorite” product (the product that the customer purchased the least).
+
+--> with cte1 as (<br/>
+  select cust,prod,sum(quant) as Quantity from sales<br/>
+	group by cust,prod<br/>
+),<br/>
+cte2 as (<br/>
+   select cust,min(Quantity) as min_quant from cte1<br/>
+	group by cust<br/>
+),<br/>
+cte3 as (<br/>
+   select cust,max(Quantity) as max_quant from cte1<br/>
+	group by cust<br/>
+)<br/>
+select * from ((select p.cust as "CUSTOMER", p.prod as "MOST_FAV_PROD" from cte1 p<br/>
+inner join cte3 m on m.cust=p.cust and m.max_quant=p.Quantity) temp1<br/>
+natural join (<br/>
+select p.cust as "CUSTOMER", p.prod as "LEAST_FAV_PROD" from cte1 p<br/>
+inner join cte2 l on l.cust=p.cust and l.min_quant=p.Quantity) temp2);<br/>
+
+O/P) ![image](https://github.com/user-attachments/assets/68115ea3-5edc-43ff-847e-c841f8cd2957)
 
 

@@ -69,4 +69,26 @@ inner join cte2 l on l.cust=p.cust and l.min_quant=p.Quantity) temp2);<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/68115ea3-5edc-43ff-847e-c841f8cd2957)
 
+#### 4. For each customer and product combination, show the average sales quantities for the four seasons, Spring, Summer, Fall and Winter in four separate columns – Spring being the 3 months of March, April and May; and Summer the next 3 months (June, July and August); and so on – ignore the YEAR component of the dates (i.e., 10/25/2016 is considered the same date as 10/25/2017, etc.). Additionally, compute the average for the “whole” year (again ignoring the YEAR component, meaning simply compute AVG) along with the total quantities (SUM) and the counts (COUNT).
+
+--> select cust as CUSTOMER, prod as PRODUCT,<br/>
+round(avg(case when month=3 then quant <br/>
+         when month=4 then quant <br/>
+         when month=5 then quant else 0 end),2) as SPRING_AVG,<br/>
+round(avg(case when month=6 then quant <br/>
+         when month=7 then quant <br/>
+         when month=8 then quant else 0 end),2) as SUMMER_AVG,<br/>
+round(avg(case when month=9 then quant <br/>
+         when month=10 then quant <br/>
+         when month=11 then quant else 0 end),2) as FALL_AVG,<br/>
+round(avg(case when month=12 then quant <br/>
+         when month=1 then quant <br/>
+         when month=2 then quant else 0 end),2) as WINTER_AVG,<br/>
+round(avg(quant),2) as AVERAGE,<br/>
+sum(quant) as TOTAL,<br/>
+count(*) as COUNT<br/>
+from sales<br/>
+group by cust,prod;<br/>
+
+O/P) ![image](https://github.com/user-attachments/assets/bde40a4c-f528-481f-888a-633f84232126)
 

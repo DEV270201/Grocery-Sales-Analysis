@@ -92,3 +92,50 @@ group by cust,prod;<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/bde40a4c-f528-481f-888a-633f84232126)
 
+#### 5. For each product, output the maximum sales quantities for each quarter in 4 separate columns. Like the first report, display the corresponding dates (i.e., dates of those corresponding maximum sales quantities). Ignore the YEAR component of the dates (i.e., 10/25/2016 is considered the same date as 10/25/2017, etc.)
+
+--> with cte as (<br/>
+select prod as PRODUCT,<br/>
+max( case when month=1 then quant <br/>
+          &ensp;when month=2 then quant <br/>
+          &ensp;when month=3 then quant else 0 end) as Q1_MAX,<br/>
+max( case when month=4 then quant <br/>
+         &ensp;when month=5 then quant <br/>
+         &ensp;when month=6 then quant else 0 end) as Q2_MAX,<br/>
+max( case when month=7 then quant <br/>
+         &ensp;when month=18 then quant <br/>
+         &ensp;when month=9 then quant else 0 end) as Q3_MAX,<br/>
+max( case when month=10 then quant <br/>
+         &ensp;when month=11 then quant <br/>
+         &ensp;when month=12 then quant else 0 end) as Q4_MAX<br/>
+from sales<br/>
+group by prod),<br/>
+dquarter_1 as (<br/>
+  &ensp; select c.PRODUCT, c.Q1_MAX, s.date as DATE from sales s<br/>
+   &ensp;inner join cte c on s.prod=c.PRODUCT and s.quant=c.Q1_MAX<br/>
+	&ensp;where s.month in (1,2,3)<br/>
+),<br/>
+dquarter_2 as (<br/>
+  &ensp; select c.PRODUCT, c.Q2_MAX, s.date as DATE from sales s<br/>
+  &ensp; inner join cte c on s.prod=c.PRODUCT and s.quant=c.Q2_MAX<br/>
+	&ensp;where s.month in (4,5,6)<br/>
+),<br/>
+dquarter_3 as (<br/>
+  &ensp; select c.PRODUCT, c.Q3_MAX, s.date as DATE from sales s<br/>
+  &ensp; inner join cte c on s.prod=c.PRODUCT and s.quant=c.Q3_MAX<br/>
+	&ensp;where s.month in (7,8,9)<br/>
+),<br/>
+dquarter_4 as (<br/>
+&ensp;   select c.PRODUCT, c.Q4_MAX, s.date as DATE from sales s<br/>
+&ensp;   inner join cte c on s.prod=c.PRODUCT and s.quant=c.Q4_MAX<br/>
+	&ensp;where s.month in (10,11,12)<br/>
+)<br/>
+select q1.*, q2.Q2_MAX, q2.DATE, q3.Q3_MAX, q3.DATE, q4.Q4_MAX, q4.DATE from dquarter_1 q1<br/>
+inner join dquarter_2 q2 on <br/>
+q1.PRODUCT = q2.PRODUCT<br/>
+inner join dquarter_3 q3 on q1.PRODUCT = q3.PRODUCT<br/>
+inner join dquarter_4 q4 on q1.PRODUCT = q4.PRODUCT order by q1.PRODUCT;<br/>
+
+O/P) ![image](https://github.com/user-attachments/assets/38a880d1-3f28-4a8e-b2db-445d583b3887)
+
+

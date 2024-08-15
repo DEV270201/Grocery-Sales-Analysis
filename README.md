@@ -138,4 +138,27 @@ inner join dquarter_4 q4 on q1.PRODUCT = q4.PRODUCT order by q1.PRODUCT;<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/38a880d1-3f28-4a8e-b2db-445d583b3887)
 
+#### 6. For each customer, product and month, count the number of sales transactions that were between the previous and the following month's average sales quantities. For January and December, display <NULL> or 0
+
+--> with q1 as (<br/>
+select cust,prod,month,round(avg(quant)) as avg from sales s<br/>
+group by cust,prod,month),<br/>
+q2 as (<br/>
+select l.cust,l.prod,l.month curr_month,l.avg curr_avg,r.avg next_avg<br/>
+from q1 l left join q1 r on l.month+1=r.month and l.cust=r.cust and l.prod=r.prod),<br/>
+q3 as (<br/>
+select l.*, r.avg prev_avg<br/>
+from q2 l left join q1 r on l.curr_month=r.month+1 and l.cust=r.cust and l.prod=r.prod),<br/>
+q4 as (<br/>
+select q3.*,s.quant from q3 <br/>
+inner join sales s <br/>
+on q3.cust = s.cust and q3.prod = s.prod <br/>
+and q3.curr_month = s.month)<br/>
+select cust as CUSTOMER, prod as PRODUCT, curr_month as MONTH, count(*) as SALES_COUNT_BETWEEN_AVGS<br/>
+from q4 where quant between prev_avg and next_avg or quant between next_avg and prev_avg<br/>
+group by cust,prod,month<br/>
+order by cust,prod;<br/>
+
+O/P) ![image](https://github.com/user-attachments/assets/d9cf1f82-52cd-4cd1-b13c-c6faee7bac5c)
+
 

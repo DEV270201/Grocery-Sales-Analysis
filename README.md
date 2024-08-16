@@ -161,4 +161,24 @@ order by cust,prod;<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/d9cf1f82-52cd-4cd1-b13c-c6faee7bac5c)
 
+#### 7. For customer and product, show the average sales before, during and after each month (e.g., for February, show average sales of January and March. For “before” January and “after” December, display <NULL>. The “YEAR” attribute is not considered for this query – for example, both January of 2017 and January of 2018 are considered January regardless of the year
+
+--> with q1 as (<br/>
+select cust,prod,month,round(avg(quant)) as curr_avg from sales s<br/>
+group by cust,prod,month),<br/>
+q2 as (<br/>
+  select l.cust, l.prod, l.month, l.curr_avg, r.month as next, r.curr_avg as next_avg<br/>
+  from q1 l left join q1 r on l.month+1 = r.month and l.cust = r.cust and l.prod = r.prod<br/>
+),<br/>
+q3 as (<br/>
+  select l.*, r.month as prev,r.curr_avg as prev_avg<br/>
+  from q2 l left join q1 r on l.month = r.month+1 and l.cust = r.cust and l.prod = r.prod<br/>
+)<br/>
+select a.cust as CUSTOMER, a.prod as PRODUCT, a.month as MONTH, <br/>
+a.prev_avg as BEFORE_AVG, a.curr_avg as DURING_AVG, a.next_avg as AFTER_AVG<br/>
+from q3 a;<br/>
+
+O/P) ![image](https://github.com/user-attachments/assets/5969a399-4101-4184-9416-e6e921922836)
+
+
 

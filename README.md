@@ -180,5 +180,31 @@ from q3 a;<br/>
 
 O/P) ![image](https://github.com/user-attachments/assets/5969a399-4101-4184-9416-e6e921922836)
 
+#### 8. For each customer, product and state combination, compute (1) the product’s average sale of this customer for the state, (2) the average sale of the product and the state but for all of the other customers, (3) the customer’s average sale for the given state, but for all of the other products, and (4) the customer’s average sale for the given product, but for all of the other states.
+
+--> with q1 as(select prod,cust,state ,round(avg(quant)) avg_prod_sale from sales s<br />
+			 &ensp;group by prod,cust,state<br />
+			 &ensp;order by prod,cust,state),<br />
+	q2 as(select q1.prod,q1.cust,q1.state ,round(avg(s.quant)) av_diff_cust from sales s<br />
+		   &ensp; inner join q1 on q1.cust!=s.cust and q1.state=s.state and q1.prod=s.prod<br />
+			 &ensp;group by q1.prod,q1.cust,q1.state <br />
+			 &ensp;order by q1.prod,q1.cust,q1.state),<br />
+	q3 as(select q1.prod,q1.cust,q1.state ,round(avg(s.quant)) av_diff_pd from sales s<br />
+		  &ensp;  inner join q1 on q1.prod!=s.prod and q1.state=s.state and q1.cust=s.cust<br />
+		 &ensp;	group by q1.prod,q1.cust,q1.state <br />
+		 &ensp;	order by q1.prod,q1.cust,q1.state),<br />
+	q4 as(select q1.prod,q1.cust,q1.state ,round(avg(s.quant)) av_diff_st from sales s<br />
+		  &ensp;  inner join q1 on q1.state!=s.state and q1.prod=s.prod and q1.cust=s.cust<br />
+		 &ensp;	group by q1.prod,q1.cust,q1.state <br />
+		 &ensp;	order by q1.prod,q1.cust,q1.state)<br />
+	select q1.cust,q1.prod,q1.state,q1.avg_prod_sale as PROD_AVG,q2.av_diff_cust as OTHER_CUST_AVG,<br />
+    q3.av_diff_pd as OTHER_PROD_AVG, q4.av_diff_st as OTHER_STATE_AVG<br />
+	from q1<br />
+	inner join q2 on q2.prod=q1.prod and q2.state=q1.state and q2.cust=q1.cust <br />
+	inner join q3 on q3.prod=q1.prod and q3.state=q1.state and q3.cust=q1.cust<br />
+	inner join q4 on q4.prod=q1.prod and q4.state=q1.state and q4.cust=q1.cust;<br />
+
+ O/P) ![image](https://github.com/user-attachments/assets/4e64f7ef-ddcd-4342-ae33-4daa48994efa)
+
 
 
